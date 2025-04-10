@@ -7,8 +7,19 @@ import Link from 'next/link';
 // Using Font Awesome icons instead of React icons
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ImageGallery from '@/components/ImageGallery';
+import ProductNutrition from '@/components/ProductNutrition';
+import RelatedProducts from '@/components/RelatedProducts';
+import RecentlyViewed from '@/components/RecentlyViewed';
 import { Product, Review } from '@/types/database.types';
-import { getProductBySlug, getProductReviews } from '@/lib/api';
+import {
+  getProductBySlug,
+  getProductReviews,
+  getProductImages,
+  getProductNutrition,
+  trackProductView,
+  getRelatedProducts
+} from '@/lib/api';
 import { useCartStore, useWishlistStore, useAuthStore } from '@/lib/store';
 
 export default function ProductDetailPage() {
@@ -21,10 +32,13 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [productImages, setProductImages] = useState<string[]>([]);
+  const [nutrition, setNutrition] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<'description' | 'nutrition' | 'reviews'>('description');
 
   const { addItem } = useCartStore();
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, userId } = useAuthStore();
 
   useEffect(() => {
     const loadProductData = async () => {
@@ -38,9 +52,22 @@ export default function ProductDetailPage() {
 
         setProduct(productData);
 
+        // Track product view for logged-in users
+        if (isAuthenticated && userId) {
+          trackProductView(userId, productData.id);
+        }
+
         // Load reviews
         const reviewsData = await getProductReviews(productData.id);
         setReviews(reviewsData);
+
+        // Load product images
+        const images = await getProductImages(productData.id);
+        setProductImages(images);
+
+        // Load nutrition information
+        const nutritionData = await getProductNutrition(productData.id);
+        setNutrition(nutritionData);
       } catch (err) {
         console.error('Error loading product data:', err);
         setError('Failed to load product details. Please try again later.');
@@ -154,26 +181,42 @@ export default function ProductDetailPage() {
             <div className="flex flex-col md:flex-row -mx-4">
               {/* Product Image */}
               <div className="md:w-1/2 px-4 mb-8 md:mb-0">
-                <div className="relative h-96 md:h-[500px] rounded-lg overflow-hidden">
-                  <Image
-                    src={product.image_url || 'https://via.placeholder.com/600x600'}
-                    alt={product.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-cover"
-                    priority
-                  />
-                  {product.is_bestseller && (
-                    <div className="absolute top-4 right-4 bg-amber-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-                      BESTSELLER
-                    </div>
-                  )}
-                  {product.is_organic && (
-                    <div className="absolute top-4 left-4 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-                      ORGANIC
-                    </div>
-                  )}
-                </div>
+                {productImages.length > 0 ? (
+                  <div className="relative">
+                    <ImageGallery images={productImages} alt={product.name} />
+                    {product.is_bestseller && (
+                      <div className="absolute top-4 right-4 bg-amber-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10">
+                        BESTSELLER
+                      </div>
+                    )}
+                    {product.is_organic && (
+                      <div className="absolute top-4 left-4 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10">
+                        ORGANIC
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="relative h-96 md:h-[500px] rounded-lg overflow-hidden">
+                    <Image
+                      src={product.image_url || 'https://via.placeholder.com/600x600'}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover"
+                      priority
+                    />
+                    {product.is_bestseller && (
+                      <div className="absolute top-4 right-4 bg-amber-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                        BESTSELLER
+                      </div>
+                    )}
+                    {product.is_organic && (
+                      <div className="absolute top-4 left-4 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                        ORGANIC
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Product Details */}
@@ -201,7 +244,75 @@ export default function ProductDetailPage() {
                 </div>
 
                 <div className="mb-6">
-                  <p className="text-gray-600">{product.description || 'No description available.'}</p>
+                  {/* Product tabs */}
+                  <div className="border-b border-gray-200 mb-4">
+                    <div className="flex space-x-4">
+                      <button
+                        onClick={() => setActiveTab('description')}
+                        className={`py-2 px-4 font-medium ${activeTab === 'description'
+                          ? 'text-amber-600 border-b-2 border-amber-600'
+                          : 'text-gray-500 hover:text-gray-700'}`}
+                      >
+                        Description
+                      </button>
+                      <button
+                        onClick={() => setActiveTab('nutrition')}
+                        className={`py-2 px-4 font-medium ${activeTab === 'nutrition'
+                          ? 'text-amber-600 border-b-2 border-amber-600'
+                          : 'text-gray-500 hover:text-gray-700'}`}
+                      >
+                        Nutrition
+                      </button>
+                      <button
+                        onClick={() => setActiveTab('reviews')}
+                        className={`py-2 px-4 font-medium ${activeTab === 'reviews'
+                          ? 'text-amber-600 border-b-2 border-amber-600'
+                          : 'text-gray-500 hover:text-gray-700'}`}
+                      >
+                        Reviews ({reviews.length})
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Tab content */}
+                  <div className="py-2">
+                    {activeTab === 'description' && (
+                      <p className="text-gray-600">{product.description || 'No description available.'}</p>
+                    )}
+
+                    {activeTab === 'nutrition' && (
+                      <ProductNutrition nutrition={nutrition} />
+                    )}
+
+                    {activeTab === 'reviews' && (
+                      <div className="space-y-4">
+                        {reviews.length === 0 ? (
+                          <p className="text-gray-600">No reviews yet. Be the first to review this product!</p>
+                        ) : (
+                          reviews.map((review) => (
+                            <div key={review.id} className="border-b border-gray-200 pb-4">
+                              <div className="flex items-center mb-2">
+                                <div className="flex text-amber-400">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <i
+                                      key={star}
+                                      className={star <= review.rating ? 'fas fa-star' : 'far fa-star'}
+                                    ></i>
+                                  ))}
+                                </div>
+                                <span className="text-gray-600 text-sm ml-2">
+                                  {new Date(review.created_at).toLocaleDateString()}
+                                </span>
+                              </div>
+                              {review.comment && (
+                                <p className="text-gray-700">{review.comment}</p>
+                              )}
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="mb-6">
@@ -331,6 +442,20 @@ export default function ProductDetailPage() {
                 </div>
               )}
             </div>
+
+            {/* Related Products Section */}
+            {product.category_id && (
+              <div className="mt-16">
+                <RelatedProducts productId={product.id} categoryId={product.category_id} />
+              </div>
+            )}
+
+            {/* Recently Viewed Section */}
+            {isAuthenticated && userId && (
+              <div className="mt-16">
+                <RecentlyViewed currentProductId={product.id} />
+              </div>
+            )}
           </div>
         </section>
       </main>
