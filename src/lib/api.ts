@@ -601,25 +601,6 @@ export const getProductReviews = async (productId: string): Promise<Review[]> =>
   return data || [];
 };
 
-// New function to get related products
-export const getRelatedProducts = async (productId: string, categoryId: string, limit: number = 4): Promise<Product[]> => {
-  try {
-    // Get products in the same category, excluding the current product
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('category_id', categoryId)
-      .neq('id', productId)
-      .limit(limit);
-
-    if (error) throw error;
-    return data || [];
-  } catch (error) {
-    console.error('Error fetching related products:', error);
-    return [];
-  }
-};
-
 // New function to get product images
 export const getProductImages = async (productId: string): Promise<string[]> => {
   try {
