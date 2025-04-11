@@ -33,7 +33,6 @@ export default function RelatedProducts({ productId, categoryId }: RelatedProduc
   if (loading) {
     return (
       <div className="mt-16">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">You May Also Like</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[...Array(4)].map((_, index) => (
             <div key={index} className="bg-gray-200 animate-pulse h-64 rounded-lg"></div>
@@ -94,7 +93,6 @@ export default function RelatedProducts({ productId, categoryId }: RelatedProduc
 
     return (
       <div className="mt-16">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">You May Also Like</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {placeholderProducts.map((product) => (
             <ProductCard key={product.id} product={product as Product} />

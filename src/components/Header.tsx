@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAuthStore, useCartStore } from '@/lib/store';
+import { useAuthStore, useCartStore, useWishlistStore } from '@/lib/store';
 import { useAuth } from '@/lib/auth-context';
 
 export default function Header() {
@@ -11,6 +11,7 @@ export default function Header() {
   const pathname = usePathname();
   const { isAuthenticated, isAdmin } = useAuthStore();
   const { totalItems } = useCartStore();
+  const { items: wishlistItems } = useWishlistStore();
   const { signOut } = useAuth();
 
   const toggleMobileMenu = () => {
@@ -40,6 +41,9 @@ export default function Header() {
           </Link>
           <Link href="/wishlist" className="relative text-gray-700 hover:text-amber-600">
             <i className="fas fa-heart text-xl"></i>
+            {wishlistItems.length > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{wishlistItems.length}</span>
+            )}
           </Link>
           {isAuthenticated ? (
             <Link href="/account" className="hidden md:block bg-amber-600 text-white px-4 py-2 rounded-md hover:bg-amber-700">

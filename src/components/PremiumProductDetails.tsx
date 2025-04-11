@@ -282,6 +282,8 @@ export default function PremiumProductDetails({
                   ? 'bg-red-50 border-red-200 text-red-500'
                   : 'border-gray-300 text-gray-500 hover:bg-gray-50'
               }`}
+              aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+              title={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
             >
               <i className={inWishlist ? 'fas fa-heart' : 'far fa-heart'}></i>
             </button>
@@ -331,45 +333,45 @@ export default function PremiumProductDetails({
 
       {/* Product Tabs */}
       <div className="border-t border-gray-100">
-        <div className="container mx-auto px-4 py-8">
-          <div className="border-b border-gray-200 mb-8">
-            <div className="flex justify-center md:justify-start space-x-8 overflow-x-auto pb-1">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex justify-center md:justify-start overflow-x-auto">
+            <div className="inline-flex bg-gray-100 rounded-lg p-1 mb-6">
               <button
                 onClick={() => setActiveTab('description')}
-                className={`py-3 px-1 text-sm font-medium border-b-2 whitespace-nowrap ${
+                className={`px-4 py-2 text-sm font-medium rounded-md whitespace-nowrap transition-colors ${
                   activeTab === 'description'
-                    ? 'border-amber-600 text-amber-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-white text-gray-800 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
-                Product Details
+                Details
               </button>
               <button
                 onClick={() => setActiveTab('nutrition')}
-                className={`py-3 px-1 text-sm font-medium border-b-2 whitespace-nowrap ${
+                className={`px-4 py-2 text-sm font-medium rounded-md whitespace-nowrap transition-colors ${
                   activeTab === 'nutrition'
-                    ? 'border-amber-600 text-amber-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-white text-gray-800 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
-                Nutrition Facts
+                Nutrition
               </button>
               <button
                 onClick={() => setActiveTab('reviews')}
-                className={`py-3 px-1 text-sm font-medium border-b-2 whitespace-nowrap ${
+                className={`px-4 py-2 text-sm font-medium rounded-md whitespace-nowrap transition-colors ${
                   activeTab === 'reviews'
-                    ? 'border-amber-600 text-amber-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-white text-gray-800 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
                 Reviews ({reviews.length})
               </button>
               <button
                 onClick={() => setActiveTab('recipes')}
-                className={`py-3 px-1 text-sm font-medium border-b-2 whitespace-nowrap ${
+                className={`px-4 py-2 text-sm font-medium rounded-md whitespace-nowrap transition-colors ${
                   activeTab === 'recipes'
-                    ? 'border-amber-600 text-amber-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-white text-gray-800 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
                 Recipes

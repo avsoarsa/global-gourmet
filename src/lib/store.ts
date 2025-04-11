@@ -88,19 +88,46 @@ interface WishlistStore {
   isInWishlist: (productId: string) => boolean;
 }
 
+// Load wishlist from localStorage if available
+const loadWishlistFromStorage = (): string[] => {
+  if (typeof window === 'undefined') return [];
+
+  try {
+    const storedWishlist = localStorage.getItem('wishlist');
+    return storedWishlist ? JSON.parse(storedWishlist) : [];
+  } catch (error) {
+    console.error('Error loading wishlist from localStorage:', error);
+    return [];
+  }
+};
+
+// Save wishlist to localStorage
+const saveWishlistToStorage = (items: string[]) => {
+  if (typeof window === 'undefined') return;
+
+  try {
+    localStorage.setItem('wishlist', JSON.stringify(items));
+  } catch (error) {
+    console.error('Error saving wishlist to localStorage:', error);
+  }
+};
+
 export const useWishlistStore = create<WishlistStore>((set, get) => ({
-  items: [],
+  items: loadWishlistFromStorage(),
 
   addItem: (productId: string) => {
-    set((state) => ({
-      items: [...state.items, productId],
-    }));
+    // Only add if not already in wishlist
+    if (!get().isInWishlist(productId)) {
+      const newItems = [...get().items, productId];
+      set({ items: newItems });
+      saveWishlistToStorage(newItems);
+    }
   },
 
   removeItem: (productId: string) => {
-    set((state) => ({
-      items: state.items.filter((id) => id !== productId),
-    }));
+    const newItems = get().items.filter((id) => id !== productId);
+    set({ items: newItems });
+    saveWishlistToStorage(newItems);
   },
 
   isInWishlist: (productId: string) => {
