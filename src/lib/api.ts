@@ -486,6 +486,17 @@ export const getGiftBoxById = async (id: string): Promise<GiftBox | null> => {
   return data;
 };
 
+export const getGiftBoxItems = async (giftBoxId: string): Promise<any[]> => {
+  try {
+    // In a real implementation, this would fetch from a gift_box_items table
+    // For now, we'll return a simulated empty array since we're using the product selection UI
+    return [];
+  } catch (error) {
+    console.error('Error fetching gift box items:', error);
+    return [];
+  }
+};
+
 // Coupons API
 export const validateCoupon = async (code: string, subtotal: number) => {
   try {
@@ -601,54 +612,6 @@ export const getProductReviews = async (productId: string): Promise<Review[]> =>
   return data || [];
 };
 
-// New function to get product images
-export const getProductImages = async (productId: string): Promise<string[]> => {
-  try {
-    // In a real implementation, this would fetch from a product_images table
-    // For now, we'll return a simulated response with the product's main image and some generic images
-    const { data, error } = await supabase
-      .from('products')
-      .select('image_url')
-      .eq('id', productId)
-      .single();
-
-    if (error) throw error;
-
-    // Return the product's main image plus some generic images
-    return [
-      data.image_url,
-      'https://images.unsplash.com/photo-1600348759200-5b94753c5a4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=880&q=80',
-      'https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=735&q=80',
-      'https://images.unsplash.com/photo-1601493700895-eea82a48a8f2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80'
-    ];
-  } catch (error) {
-    console.error('Error fetching product images:', error);
-    return [];
-  }
-};
-
-// New function to get product nutrition information
-export const getProductNutrition = async (productId: string): Promise<any> => {
-  try {
-    // In a real implementation, this would fetch from a product_nutrition table
-    // For now, we'll return a simulated response
-    return {
-      servingSize: '30g',
-      calories: 160,
-      protein: 6,
-      fat: 14,
-      carbs: 6,
-      fiber: 3,
-      sugar: 1,
-      vitamins: ['Vitamin E', 'Vitamin B6'],
-      minerals: ['Magnesium', 'Phosphorus']
-    };
-  } catch (error) {
-    console.error('Error fetching product nutrition:', error);
-    return null;
-  }
-};
-
 export const createReview = async (
   userId: string,
   productId: string,
@@ -726,36 +689,3 @@ export const subscribeToProductNotifications = async (email: string, productId: 
   }
 };
 
-// New function to track recently viewed products
-export const trackProductView = async (userId: string | null, productId: string): Promise<void> => {
-  try {
-    if (!userId) {
-      // For anonymous users, we could use localStorage in the component
-      return;
-    }
-
-    // In a real implementation, this would insert into a recently_viewed table
-    // For now, we'll just log it
-    console.log(`User ${userId} viewed product ${productId}`);
-  } catch (error) {
-    console.error('Error tracking product view:', error);
-  }
-};
-
-// New function to get recently viewed products
-export const getRecentlyViewedProducts = async (userId: string): Promise<Product[]> => {
-  try {
-    // In a real implementation, this would fetch from a recently_viewed table
-    // For now, we'll return a simulated response
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .limit(4);
-
-    if (error) throw error;
-    return data || [];
-  } catch (error) {
-    console.error('Error fetching recently viewed products:', error);
-    return [];
-  }
-};

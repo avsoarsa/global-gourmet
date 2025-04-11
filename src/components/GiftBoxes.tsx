@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 export default function GiftBoxes() {
   return (
     <section className="py-12 bg-gray-50" id="gift-boxes">
@@ -17,9 +19,9 @@ export default function GiftBoxes() {
               <p className="text-gray-600 mb-4">A carefully curated selection of our finest dry fruits and spices, perfect for gifting.</p>
               <div className="flex justify-between items-center">
                 <span className="font-bold text-gray-800">$49.99</span>
-                <button className="bg-amber-600 text-white px-4 py-2 rounded-md hover:bg-amber-700 font-medium">
+                <Link href="/gift-boxes/1" className="bg-amber-600 text-white px-4 py-2 rounded-md hover:bg-amber-700 font-medium inline-block text-center">
                   Customize
-                </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -34,9 +36,9 @@ export default function GiftBoxes() {
               <p className="text-gray-600 mb-4">Organic superfoods and sprouts for health-conscious individuals.</p>
               <div className="flex justify-between items-center">
                 <span className="font-bold text-gray-800">$59.99</span>
-                <button className="bg-amber-600 text-white px-4 py-2 rounded-md hover:bg-amber-700 font-medium">
+                <Link href="/gift-boxes/2" className="bg-amber-600 text-white px-4 py-2 rounded-md hover:bg-amber-700 font-medium inline-block text-center">
                   Customize
-                </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -51,18 +53,18 @@ export default function GiftBoxes() {
               <p className="text-gray-600 mb-4">Premium selection for corporate gifting with customizable branding options.</p>
               <div className="flex justify-between items-center">
                 <span className="font-bold text-gray-800">$99.99</span>
-                <button className="bg-amber-600 text-white px-4 py-2 rounded-md hover:bg-amber-700 font-medium">
+                <Link href="/gift-boxes/3" className="bg-amber-600 text-white px-4 py-2 rounded-md hover:bg-amber-700 font-medium inline-block text-center">
                   Customize
-                </button>
+                </Link>
               </div>
             </div>
           </div>
         </div>
 
         <div className="text-center mt-10">
-          <button className="bg-amber-600 text-white px-6 py-3 rounded-md hover:bg-amber-700 font-medium">
+          <Link href="/gift-boxes/create" className="bg-amber-600 text-white px-6 py-3 rounded-md hover:bg-amber-700 font-medium inline-block">
             Create Your Own Gift Box
-          </button>
+          </Link>
         </div>
       </div>
     </section>
