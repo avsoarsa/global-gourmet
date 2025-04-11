@@ -35,11 +35,14 @@ export default function PremiumProductDetails({
   const [selectedSize, setSelectedSize] = useState<{id: string; label: string; weight: string; price: number; stock: number}>(
     {id: 'medium', label: 'Medium Pack', weight: '500g', price: product.price, stock: product.stock_quantity}
   );
-  const [displayPrice, setDisplayPrice] = useState<number>(product.price);
+  const [basePrice, setBasePrice] = useState<number>(product.price);
+
+  // Calculate display price based on quantity and selected size
+  const displayPrice = selectedSize.price * quantity;
 
   const handleSizeChange = (option: {id: string; label: string; weight: string; price: number; stock: number}) => {
     setSelectedSize(option);
-    setDisplayPrice(option.price);
+    setBasePrice(option.price);
 
     // Reset quantity if it's more than available stock
     if (quantity > option.stock) {
@@ -170,18 +173,28 @@ export default function PremiumProductDetails({
 
           {/* Price */}
           <div className="mb-6">
-            <span className="text-3xl font-bold text-gray-800">
-              ${displayPrice.toFixed(2)}
-            </span>
-            {product.sale_price && (
-              <span className="text-gray-500 text-lg line-through ml-2">
-                ${(displayPrice * (product.price / product.sale_price)).toFixed(2)}
+            <div className="flex items-baseline">
+              <span className="text-3xl font-bold text-gray-800">
+                ${displayPrice.toFixed(2)}
               </span>
+              {product.sale_price && (
+                <span className="text-gray-500 text-lg line-through ml-2">
+                  ${(displayPrice * (product.price / product.sale_price)).toFixed(2)}
+                </span>
+              )}
+              <span className="ml-2 text-sm text-gray-700">
+                ${basePrice.toFixed(2)} per {selectedSize.weight}
+              </span>
+            </div>
+            {quantity > 1 && (
+              <div className="text-sm text-gray-700 mt-1">
+                ${basePrice.toFixed(2)} × {quantity} {quantity > 1 ? 'items' : 'item'}
+              </div>
             )}
           </div>
 
           {/* Short Description */}
-          <p className="text-gray-600 mb-6 leading-relaxed">
+          <p className="text-gray-700 mb-6 leading-relaxed">
             {product.description.split('.')[0]}. Premium quality, sourced from the finest orchards.
           </p>
 
@@ -297,7 +310,7 @@ export default function PremiumProductDetails({
               </div>
               <div>
                 <h4 className="font-medium text-gray-800">100% Natural</h4>
-                <p className="text-xs text-gray-500">No additives or preservatives</p>
+                <p className="text-xs text-gray-700">No additives or preservatives</p>
               </div>
             </div>
             <div className="flex items-center">
@@ -306,7 +319,7 @@ export default function PremiumProductDetails({
               </div>
               <div>
                 <h4 className="font-medium text-gray-800">Free Shipping</h4>
-                <p className="text-xs text-gray-500">On orders over $50</p>
+                <p className="text-xs text-gray-700">On orders over $50</p>
               </div>
             </div>
             <div className="flex items-center">
@@ -315,7 +328,7 @@ export default function PremiumProductDetails({
               </div>
               <div>
                 <h4 className="font-medium text-gray-800">Quality Guarantee</h4>
-                <p className="text-xs text-gray-500">100% satisfaction guaranteed</p>
+                <p className="text-xs text-gray-700">100% satisfaction guaranteed</p>
               </div>
             </div>
             <div className="flex items-center">
@@ -324,7 +337,7 @@ export default function PremiumProductDetails({
               </div>
               <div>
                 <h4 className="font-medium text-gray-800">Easy Returns</h4>
-                <p className="text-xs text-gray-500">30-day return policy</p>
+                <p className="text-xs text-gray-700">30-day return policy</p>
               </div>
             </div>
           </div>
@@ -383,7 +396,7 @@ export default function PremiumProductDetails({
             {activeTab === 'description' && (
               <div className="max-w-3xl mx-auto">
                 <div className="prose prose-amber">
-                  <p className="text-gray-600 mb-6 leading-relaxed">{product.description}</p>
+                  <p className="text-gray-700 mb-6 leading-relaxed">{product.description}</p>
 
                   <h3 className="text-xl font-bold text-gray-800 mb-4">Product Details</h3>
                   <div className="bg-gray-50 p-6 rounded-lg mb-6">
@@ -414,7 +427,7 @@ export default function PremiumProductDetails({
                   </div>
 
                   <h3 className="text-xl font-bold text-gray-800 mb-4">Health Benefits</h3>
-                  <ul className="list-disc pl-5 space-y-2 text-gray-600 mb-6">
+                  <ul className="list-disc pl-5 space-y-2 text-gray-700 mb-6">
                     <li>Rich in essential nutrients and antioxidants</li>
                     <li>Supports heart health and reduces inflammation</li>
                     <li>Excellent source of plant-based protein</li>
@@ -423,10 +436,10 @@ export default function PremiumProductDetails({
                   </ul>
 
                   <h3 className="text-xl font-bold text-gray-800 mb-4">How to Use</h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-gray-700 mb-4">
                     Enjoy as a nutritious snack on their own, or incorporate into your favorite recipes:
                   </p>
-                  <ul className="list-disc pl-5 space-y-2 text-gray-600">
+                  <ul className="list-disc pl-5 space-y-2 text-gray-700">
                     <li>Add to breakfast cereals, oatmeal, or yogurt</li>
                     <li>Mix into salads for extra crunch and nutrition</li>
                     <li>Use in baking for cookies, breads, and muffins</li>
@@ -447,49 +460,88 @@ export default function PremiumProductDetails({
               <div className="max-w-3xl mx-auto">
                 <div className="space-y-6">
                   {reviews.length === 0 ? (
-                    <div className="text-center py-12">
-                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i className="far fa-comment-dots text-2xl text-gray-400"></i>
+                    <div className="text-center py-8 bg-white rounded-lg shadow-sm">
+                      <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i className="far fa-comment-dots text-2xl text-amber-500"></i>
                       </div>
-                      <h3 className="text-lg font-medium text-gray-800 mb-1">No Reviews Yet</h3>
-                      <p className="text-gray-500">Be the first to review this product!</p>
+                      <h3 className="text-lg font-medium text-gray-800 mb-2">No Reviews Yet</h3>
+                      <p className="text-gray-700 mb-6">Be the first to review this product!</p>
+                      <button className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded-md font-medium transition-colors">
+                        Write a Review
+                      </button>
                     </div>
                   ) : (
-                    reviews.map((review) => (
-                      <div key={review.id} className="bg-white p-6 rounded-lg shadow-sm">
-                        <div className="flex items-center mb-4">
-                          <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 font-bold mr-3">
-                            {review.user_name ? review.user_name.charAt(0).toUpperCase() : 'U'}
+                    <div>
+                      <div className="flex justify-between items-center mb-6">
+                        <div>
+                          <h3 className="text-lg font-medium text-gray-800">Customer Reviews</h3>
+                          <div className="flex items-center mt-1">
+                            <div className="flex text-amber-400 mr-2">
+                              {renderStars(product.rating)}
+                            </div>
+                            <span className="text-gray-700">
+                              Based on {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'}
+                            </span>
                           </div>
-                          <div>
-                            <h4 className="font-medium text-gray-800">{review.user_name || 'Anonymous'}</h4>
-                            <div className="flex items-center">
-                              <div className="flex text-amber-400 mr-2">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                  <i
-                                    key={star}
-                                    className={star <= review.rating ? 'fas fa-star text-sm' : 'far fa-star text-sm'}
-                                  ></i>
-                                ))}
+                        </div>
+                        <button className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                          Write a Review
+                        </button>
+                      </div>
+
+                      {reviews.map((review) => (
+                        <div key={review.id} className="bg-white p-6 rounded-lg shadow-sm mb-4 border border-gray-100">
+                          <div className="flex items-center mb-4">
+                            <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 font-bold mr-3">
+                              {review.user_name ? review.user_name.charAt(0).toUpperCase() : 'U'}
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-gray-800">{review.user_name || 'Anonymous'}</h4>
+                              <div className="flex items-center">
+                                <div className="flex text-amber-400 mr-2">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <i
+                                      key={star}
+                                      className={star <= review.rating ? 'fas fa-star text-sm' : 'far fa-star text-sm'}
+                                    ></i>
+                                  ))}
+                                </div>
+                                <span className="text-gray-700 text-sm">
+                                  {new Date(review.created_at).toLocaleDateString()}
+                                </span>
                               </div>
-                              <span className="text-gray-500 text-sm">
-                                {new Date(review.created_at).toLocaleDateString()}
+                            </div>
+                            <div className="ml-auto">
+                              <span className="bg-green-50 text-green-700 text-xs px-2 py-1 rounded-full">
+                                Verified Purchase
                               </span>
                             </div>
                           </div>
+                          {review.comment && (
+                            <p className="text-gray-700">{review.comment}</p>
+                          )}
+                          <div className="mt-3 flex items-center text-sm">
+                            <button className="text-gray-500 hover:text-gray-700 flex items-center mr-4">
+                              <i className="far fa-thumbs-up mr-1"></i> Helpful (0)
+                            </button>
+                            <button className="text-gray-500 hover:text-gray-700 flex items-center">
+                              <i className="far fa-flag mr-1"></i> Report
+                            </button>
+                          </div>
                         </div>
-                        {review.comment && (
-                          <p className="text-gray-600">{review.comment}</p>
-                        )}
-                      </div>
-                    ))
+                      ))}
+                    </div>
                   )}
                 </div>
               </div>
             )}
 
             {activeTab === 'recipes' && (
-              <div>
+              <div className="max-w-6xl mx-auto">
+                <div className="mb-6">
+                  <h3 className="text-lg font-medium text-gray-800 mb-2">Delicious Recipes with {product.name}</h3>
+                  <p className="text-gray-700">Try these chef-curated recipes featuring our premium {product.name}.</p>
+                </div>
                 <ProductRecipes productName={product.name} />
               </div>
             )}

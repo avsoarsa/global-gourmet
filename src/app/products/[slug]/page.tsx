@@ -107,7 +107,7 @@ export default function ProductDetailPage() {
   };
 
   const handleToggleWishlist = () => {
-    if (!product || !isAuthenticated) return;
+    if (!product) return;
 
     if (isInWishlist(product.id)) {
       removeFromWishlist(product.id);
@@ -177,14 +177,18 @@ export default function ProductDetailPage() {
             <Link href="/" className="hover:text-amber-600">Home</Link>
             <span className="mx-2">/</span>
             <Link href="/products" className="hover:text-amber-600">Products</Link>
-            {category && (
+            {category && category.length > 0 && (
               <>
                 <span className="mx-2">/</span>
                 <Link href={`/categories/${category.toLowerCase().replace(/\s+/g, '-')}`} className="hover:text-amber-600">{category}</Link>
               </>
             )}
-            <span className="mx-2">/</span>
-            <span className="text-gray-900 font-medium truncate">{product.name}</span>
+            {product.name && (
+              <>
+                <span className="mx-2">/</span>
+                <span className="text-gray-900 font-medium truncate">{product.name}</span>
+              </>
+            )}
           </div>
         </div>
 
