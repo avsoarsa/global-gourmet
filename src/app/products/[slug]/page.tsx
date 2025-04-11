@@ -11,6 +11,9 @@ import ImageGallery from '@/components/ImageGallery';
 import ProductNutrition from '@/components/ProductNutrition';
 import RelatedProducts from '@/components/RelatedProducts';
 import RecentlyViewed from '@/components/RecentlyViewed';
+import ProductSizeSelector from '@/components/ProductSizeSelector';
+import ProductRecipes from '@/components/ProductRecipes';
+import BulkOrderFeatures from '@/components/BulkOrderFeatures';
 import { Product, Review } from '@/types/database.types';
 import {
   getProductBySlug,
@@ -34,7 +37,12 @@ export default function ProductDetailPage() {
   const [addingToCart, setAddingToCart] = useState(false);
   const [productImages, setProductImages] = useState<string[]>([]);
   const [nutrition, setNutrition] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'description' | 'nutrition' | 'reviews'>('description');
+  const [activeTab, setActiveTab] = useState<'description' | 'nutrition' | 'reviews' | 'recipes'>('description');
+  const [selectedSize, setSelectedSize] = useState<{id: string; label: string; weight: string; price: number; stock: number}>(
+    {id: 'medium', label: 'Medium Pack', weight: '500g', price: 0, stock: 0}
+  );
+  const [displayPrice, setDisplayPrice] = useState<number>(0);
+  const [category, setCategory] = useState<string>('');
 
   const { addItem } = useCartStore();
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
@@ -52,9 +60,31 @@ export default function ProductDetailPage() {
 
         setProduct(productData);
 
+        // Initialize price and selected size
+        setDisplayPrice(productData.price);
+        setSelectedSize({
+          id: 'medium',
+          label: 'Medium Pack',
+          weight: '500g',
+          price: productData.price,
+          stock: productData.stock_quantity
+        });
+
         // Track product view for logged-in users
         if (isAuthenticated && userId) {
           trackProductView(userId, productData.id);
+        }
+
+        // Get category information
+        if (productData.category_id) {
+          try {
+            const categoryData = await getCategoryBySlug(productData.category_id);
+            if (categoryData) {
+              setCategory(categoryData.name);
+            }
+          } catch (error) {
+            console.error('Error fetching category:', error);
+          }
         }
 
         // Load reviews
@@ -90,11 +120,31 @@ export default function ProductDetailPage() {
     if (!product) return;
 
     setAddingToCart(true);
-    addItem(product, quantity);
+
+    // Create a modified product with the selected size and price
+    const sizedProduct = {
+      ...product,
+      name: `${product.name} - ${selectedSize.weight}`,
+      price: selectedSize.price,
+      stock_quantity: selectedSize.stock
+    };
+
+    // Add to cart
+    addItem(sizedProduct, quantity);
 
     setTimeout(() => {
       setAddingToCart(false);
     }, 1000);
+  };
+
+  const handleSizeChange = (option: {id: string; label: string; weight: string; price: number; stock: number}) => {
+    setSelectedSize(option);
+    setDisplayPrice(option.price);
+
+    // Reset quantity if it's more than available stock
+    if (quantity > option.stock) {
+      setQuantity(option.stock > 0 ? 1 : 0);
+    }
   };
 
   const handleToggleWishlist = () => {
@@ -234,11 +284,11 @@ export default function ProductDetailPage() {
 
                 <div className="mb-6">
                   <span className="text-2xl font-bold text-gray-800">
-                    ${product.price.toFixed(2)}
+                    ${displayPrice.toFixed(2)}
                   </span>
                   {product.sale_price && (
                     <span className="text-gray-500 text-lg line-through ml-2">
-                      ${product.sale_price.toFixed(2)}
+                      ${(displayPrice * (product.price / product.sale_price)).toFixed(2)}
                     </span>
                   )}
                 </div>
@@ -246,10 +296,10 @@ export default function ProductDetailPage() {
                 <div className="mb-6">
                   {/* Product tabs */}
                   <div className="border-b border-gray-200 mb-4">
-                    <div className="flex space-x-4">
+                    <div className="flex space-x-4 overflow-x-auto pb-1">
                       <button
                         onClick={() => setActiveTab('description')}
-                        className={`py-2 px-4 font-medium ${activeTab === 'description'
+                        className={`py-2 px-4 font-medium whitespace-nowrap ${activeTab === 'description'
                           ? 'text-amber-600 border-b-2 border-amber-600'
                           : 'text-gray-500 hover:text-gray-700'}`}
                       >
@@ -257,7 +307,7 @@ export default function ProductDetailPage() {
                       </button>
                       <button
                         onClick={() => setActiveTab('nutrition')}
-                        className={`py-2 px-4 font-medium ${activeTab === 'nutrition'
+                        className={`py-2 px-4 font-medium whitespace-nowrap ${activeTab === 'nutrition'
                           ? 'text-amber-600 border-b-2 border-amber-600'
                           : 'text-gray-500 hover:text-gray-700'}`}
                       >
@@ -265,11 +315,19 @@ export default function ProductDetailPage() {
                       </button>
                       <button
                         onClick={() => setActiveTab('reviews')}
-                        className={`py-2 px-4 font-medium ${activeTab === 'reviews'
+                        className={`py-2 px-4 font-medium whitespace-nowrap ${activeTab === 'reviews'
                           ? 'text-amber-600 border-b-2 border-amber-600'
                           : 'text-gray-500 hover:text-gray-700'}`}
                       >
                         Reviews ({reviews.length})
+                      </button>
+                      <button
+                        onClick={() => setActiveTab('recipes')}
+                        className={`py-2 px-4 font-medium whitespace-nowrap ${activeTab === 'recipes'
+                          ? 'text-amber-600 border-b-2 border-amber-600'
+                          : 'text-gray-500 hover:text-gray-700'}`}
+                      >
+                        Recipes
                       </button>
                     </div>
                   </div>
@@ -277,7 +335,41 @@ export default function ProductDetailPage() {
                   {/* Tab content */}
                   <div className="py-2">
                     {activeTab === 'description' && (
-                      <p className="text-gray-600">{product.description || 'No description available.'}</p>
+                      <div>
+                        <p className="text-gray-600 mb-6">{product.description || 'No description available.'}</p>
+
+                        {/* Product details */}
+                        <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                          <h4 className="font-bold text-gray-800 mb-3">Product Details</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="flex">
+                              <div className="w-32 text-gray-600">Origin:</div>
+                              <div className="font-medium">Premium Quality</div>
+                            </div>
+                            <div className="flex">
+                              <div className="w-32 text-gray-600">Category:</div>
+                              <div className="font-medium">{category}</div>
+                            </div>
+                            <div className="flex">
+                              <div className="w-32 text-gray-600">Storage:</div>
+                              <div className="font-medium">Store in a cool, dry place</div>
+                            </div>
+                            <div className="flex">
+                              <div className="w-32 text-gray-600">Shelf Life:</div>
+                              <div className="font-medium">12 months</div>
+                            </div>
+                            {product.is_organic && (
+                              <div className="flex">
+                                <div className="w-32 text-gray-600">Certification:</div>
+                                <div className="font-medium">Certified Organic</div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Bulk order features */}
+                        <BulkOrderFeatures />
+                      </div>
                     )}
 
                     {activeTab === 'nutrition' && (
@@ -312,8 +404,19 @@ export default function ProductDetailPage() {
                         )}
                       </div>
                     )}
+
+                    {activeTab === 'recipes' && (
+                      <ProductRecipes productName={product.name} />
+                    )}
                   </div>
                 </div>
+
+                {/* Size selector */}
+                <ProductSizeSelector
+                  basePrice={product.price}
+                  onSizeChange={handleSizeChange}
+                  initialSize="medium"
+                />
 
                 <div className="mb-6">
                   <div className="flex items-center mb-2">
@@ -321,25 +424,34 @@ export default function ProductDetailPage() {
                     <div className="flex items-center">
                       <button
                         onClick={() => quantity > 1 && setQuantity(quantity - 1)}
-                        className="bg-gray-200 text-gray-700 px-3 py-1 rounded-l-md"
+                        disabled={selectedSize.stock <= 0}
+                        className="bg-gray-200 text-gray-700 px-3 py-1 rounded-l-md disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         -
                       </button>
                       <input
                         type="number"
                         min="1"
+                        max={selectedSize.stock}
                         value={quantity}
                         onChange={handleQuantityChange}
-                        className="w-16 text-center border-t border-b border-gray-200 py-1"
+                        disabled={selectedSize.stock <= 0}
+                        className="w-16 text-center border-t border-b border-gray-200 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                       <button
                         onClick={() => setQuantity(quantity + 1)}
-                        className="bg-gray-200 text-gray-700 px-3 py-1 rounded-r-md"
+                        disabled={selectedSize.stock <= 0 || quantity >= selectedSize.stock}
+                        className="bg-gray-200 text-gray-700 px-3 py-1 rounded-r-md disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         +
                       </button>
                     </div>
                   </div>
+                  <p className="text-sm text-gray-500 mt-1 mb-2">
+                    {selectedSize.stock > 0 ?
+                      `${selectedSize.stock} ${selectedSize.weight} packs available` :
+                      'Out of stock in this size'}
+                  </p>
 
                   <div className="flex items-center text-sm text-gray-600 mb-4">
                     <span className={product.stock_quantity > 0 ? 'text-green-600' : 'text-red-600'}>
