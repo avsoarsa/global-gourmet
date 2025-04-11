@@ -94,10 +94,10 @@ export default function ProductDetailPage() {
     if (!product) return;
 
     setAddingToCart(true);
-    
+
     // Add to cart
     addItem(product, quantity);
-    
+
     // Show success message
     toast.success(`${quantity} ${quantity > 1 ? 'items' : 'item'} added to cart`);
 
@@ -171,17 +171,23 @@ export default function ProductDetailPage() {
     <div className="font-sans bg-gray-50">
       <Header />
       <main>
-        {/* Breadcrumb - Mobile only */}
-        <div className="container mx-auto px-4 py-4 lg:hidden">
+        {/* Breadcrumb */}
+        <div className="container mx-auto px-4 py-4">
           <div className="flex items-center text-sm text-gray-500">
             <Link href="/" className="hover:text-amber-600">Home</Link>
             <span className="mx-2">/</span>
             <Link href="/products" className="hover:text-amber-600">Products</Link>
+            {category && (
+              <>
+                <span className="mx-2">/</span>
+                <Link href={`/categories/${category.toLowerCase().replace(/\s+/g, '-')}`} className="hover:text-amber-600">{category}</Link>
+              </>
+            )}
             <span className="mx-2">/</span>
             <span className="text-gray-900 font-medium truncate">{product.name}</span>
           </div>
         </div>
-        
+
         {/* Product Details Section */}
         <section className="py-6 lg:py-12">
           <div className="container mx-auto px-4">
@@ -196,7 +202,7 @@ export default function ProductDetailPage() {
               inWishlist={inWishlist}
               isAddingToCart={addingToCart}
             />
-            
+
             {/* Related Products Section */}
             {product.category_id && (
               <div className="mt-16">

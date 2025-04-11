@@ -40,7 +40,7 @@ export default function PremiumProductDetails({
   const handleSizeChange = (option: {id: string; label: string; weight: string; price: number; stock: number}) => {
     setSelectedSize(option);
     setDisplayPrice(option.price);
-    
+
     // Reset quantity if it's more than available stock
     if (quantity > option.stock) {
       setQuantity(option.stock > 0 ? 1 : 0);
@@ -102,7 +102,7 @@ export default function PremiumProductDetails({
                   </div>
                 )}
               </div>
-              
+
               {/* Thumbnails */}
               {productImages.length > 1 && (
                 <div className="flex mt-4 space-x-2 px-4">
@@ -143,7 +143,7 @@ export default function PremiumProductDetails({
             </div>
           )}
         </div>
-        
+
         {/* Right column - Product Details */}
         <div className="lg:w-1/2 p-6 lg:p-8 lg:border-l border-gray-100">
           {/* Breadcrumbs */}
@@ -154,10 +154,10 @@ export default function PremiumProductDetails({
             <span className="mx-2">/</span>
             <span className="text-gray-900 font-medium">{product.name}</span>
           </div>
-          
+
           {/* Product Title */}
           <h1 className="text-3xl font-bold text-gray-800 mb-2">{product.name}</h1>
-          
+
           {/* Rating */}
           <div className="flex items-center mb-4">
             <div className="flex mr-2">
@@ -167,7 +167,7 @@ export default function PremiumProductDetails({
               {product.rating.toFixed(1)} ({product.review_count} reviews)
             </span>
           </div>
-          
+
           {/* Price */}
           <div className="mb-6">
             <span className="text-3xl font-bold text-gray-800">
@@ -179,22 +179,47 @@ export default function PremiumProductDetails({
               </span>
             )}
           </div>
-          
+
           {/* Short Description */}
           <p className="text-gray-600 mb-6 leading-relaxed">
             {product.description.split('.')[0]}. Premium quality, sourced from the finest orchards.
           </p>
-          
+
           {/* Size Selector */}
           <div className="mb-6">
             <h3 className="text-sm font-medium text-gray-700 mb-2">SELECT SIZE</h3>
-            <ProductSizeSelector
-              basePrice={product.price}
-              onSizeChange={handleSizeChange}
-              initialSize="medium"
-            />
+            <div className="grid grid-cols-4 gap-2">
+              <button
+                onClick={() => handleSizeChange({id: 'small', label: 'Small Pack', weight: '250g', price: product.price * 0.5, stock: product.stock_quantity})}
+                className={`border rounded-md p-2 text-center transition-all ${selectedSize.id === 'small' ? 'border-amber-600 bg-amber-50 text-amber-600' : 'border-gray-300 hover:border-gray-400'}`}
+              >
+                <div className="text-sm font-medium">250g</div>
+                <div className="text-xs text-gray-500 mt-1">${(product.price * 0.5).toFixed(2)}</div>
+              </button>
+              <button
+                onClick={() => handleSizeChange({id: 'medium', label: 'Medium Pack', weight: '500g', price: product.price, stock: product.stock_quantity})}
+                className={`border rounded-md p-2 text-center transition-all ${selectedSize.id === 'medium' ? 'border-amber-600 bg-amber-50 text-amber-600' : 'border-gray-300 hover:border-gray-400'}`}
+              >
+                <div className="text-sm font-medium">500g</div>
+                <div className="text-xs text-gray-500 mt-1">${product.price.toFixed(2)}</div>
+              </button>
+              <button
+                onClick={() => handleSizeChange({id: 'large', label: 'Large Pack', weight: '1kg', price: product.price * 1.8, stock: product.stock_quantity})}
+                className={`border rounded-md p-2 text-center transition-all ${selectedSize.id === 'large' ? 'border-amber-600 bg-amber-50 text-amber-600' : 'border-gray-300 hover:border-gray-400'}`}
+              >
+                <div className="text-sm font-medium">1kg</div>
+                <div className="text-xs text-gray-500 mt-1">${(product.price * 1.8).toFixed(2)}</div>
+              </button>
+              <button
+                onClick={() => handleSizeChange({id: 'bulk', label: 'Bulk Pack', weight: '5kg', price: product.price * 8, stock: product.stock_quantity})}
+                className={`border rounded-md p-2 text-center transition-all ${selectedSize.id === 'bulk' ? 'border-amber-600 bg-amber-50 text-amber-600' : 'border-gray-300 hover:border-gray-400'}`}
+              >
+                <div className="text-sm font-medium">5kg</div>
+                <div className="text-xs text-gray-500 mt-1">${(product.price * 8).toFixed(2)}</div>
+              </button>
+            </div>
           </div>
-          
+
           {/* Quantity Selector */}
           <div className="mb-6">
             <h3 className="text-sm font-medium text-gray-700 mb-2">QUANTITY</h3>
@@ -223,13 +248,13 @@ export default function PremiumProductDetails({
                 <i className="fas fa-plus text-sm"></i>
               </button>
               <span className="ml-4 text-sm text-gray-500">
-                {selectedSize.stock > 0 ? 
-                  `${selectedSize.stock} available` : 
+                {selectedSize.stock > 0 ?
+                  `${selectedSize.stock} available` :
                   'Out of stock'}
               </span>
             </div>
           </div>
-          
+
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 mb-8">
             <button
@@ -249,19 +274,19 @@ export default function PremiumProductDetails({
                 </span>
               )}
             </button>
-            
+
             <button
               onClick={onToggleWishlist}
               className={`w-14 h-12 flex items-center justify-center rounded-md border transition-colors ${
-                inWishlist 
-                  ? 'bg-red-50 border-red-200 text-red-500' 
+                inWishlist
+                  ? 'bg-red-50 border-red-200 text-red-500'
                   : 'border-gray-300 text-gray-500 hover:bg-gray-50'
               }`}
             >
               <i className={inWishlist ? 'fas fa-heart' : 'far fa-heart'}></i>
             </button>
           </div>
-          
+
           {/* Product Features */}
           <div className="grid grid-cols-2 gap-4 mb-8">
             <div className="flex items-center">
@@ -303,15 +328,15 @@ export default function PremiumProductDetails({
           </div>
         </div>
       </div>
-      
+
       {/* Product Tabs */}
       <div className="border-t border-gray-100">
         <div className="container mx-auto px-4 py-8">
           <div className="border-b border-gray-200 mb-8">
-            <div className="flex flex-wrap -mb-px">
+            <div className="flex justify-center md:justify-start space-x-8 overflow-x-auto pb-1">
               <button
                 onClick={() => setActiveTab('description')}
-                className={`mr-8 py-4 px-1 text-sm font-medium border-b-2 ${
+                className={`py-3 px-1 text-sm font-medium border-b-2 whitespace-nowrap ${
                   activeTab === 'description'
                     ? 'border-amber-600 text-amber-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -321,7 +346,7 @@ export default function PremiumProductDetails({
               </button>
               <button
                 onClick={() => setActiveTab('nutrition')}
-                className={`mr-8 py-4 px-1 text-sm font-medium border-b-2 ${
+                className={`py-3 px-1 text-sm font-medium border-b-2 whitespace-nowrap ${
                   activeTab === 'nutrition'
                     ? 'border-amber-600 text-amber-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -331,7 +356,7 @@ export default function PremiumProductDetails({
               </button>
               <button
                 onClick={() => setActiveTab('reviews')}
-                className={`mr-8 py-4 px-1 text-sm font-medium border-b-2 ${
+                className={`py-3 px-1 text-sm font-medium border-b-2 whitespace-nowrap ${
                   activeTab === 'reviews'
                     ? 'border-amber-600 text-amber-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -341,7 +366,7 @@ export default function PremiumProductDetails({
               </button>
               <button
                 onClick={() => setActiveTab('recipes')}
-                className={`mr-8 py-4 px-1 text-sm font-medium border-b-2 ${
+                className={`py-3 px-1 text-sm font-medium border-b-2 whitespace-nowrap ${
                   activeTab === 'recipes'
                     ? 'border-amber-600 text-amber-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -351,13 +376,13 @@ export default function PremiumProductDetails({
               </button>
             </div>
           </div>
-          
+
           <div className="pb-8">
             {activeTab === 'description' && (
               <div className="max-w-3xl mx-auto">
                 <div className="prose prose-amber">
                   <p className="text-gray-600 mb-6 leading-relaxed">{product.description}</p>
-                  
+
                   <h3 className="text-xl font-bold text-gray-800 mb-4">Product Details</h3>
                   <div className="bg-gray-50 p-6 rounded-lg mb-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4">
@@ -385,7 +410,7 @@ export default function PremiumProductDetails({
                       )}
                     </div>
                   </div>
-                  
+
                   <h3 className="text-xl font-bold text-gray-800 mb-4">Health Benefits</h3>
                   <ul className="list-disc pl-5 space-y-2 text-gray-600 mb-6">
                     <li>Rich in essential nutrients and antioxidants</li>
@@ -394,7 +419,7 @@ export default function PremiumProductDetails({
                     <li>Contains omega-3 fatty acids for brain health</li>
                     <li>Helps maintain healthy cholesterol levels</li>
                   </ul>
-                  
+
                   <h3 className="text-xl font-bold text-gray-800 mb-4">How to Use</h3>
                   <p className="text-gray-600 mb-4">
                     Enjoy as a nutritious snack on their own, or incorporate into your favorite recipes:
@@ -409,13 +434,13 @@ export default function PremiumProductDetails({
                 </div>
               </div>
             )}
-            
+
             {activeTab === 'nutrition' && (
               <div className="max-w-3xl mx-auto">
                 <ProductNutrition nutrition={nutrition} />
               </div>
             )}
-            
+
             {activeTab === 'reviews' && (
               <div className="max-w-3xl mx-auto">
                 <div className="space-y-6">
@@ -460,7 +485,7 @@ export default function PremiumProductDetails({
                 </div>
               </div>
             )}
-            
+
             {activeTab === 'recipes' && (
               <div>
                 <ProductRecipes productName={product.name} />
