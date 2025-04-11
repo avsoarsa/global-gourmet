@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmation - Global Gourmet</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      padding: 20px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .logo {
+      max-width: 150px;
+      height: auto;
+    }
+    .order-info {
+      background-color: #f9f9f9;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 5px;
+    }
+    .order-details {
+      margin: 20px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background-color: #f5f5f5;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px 0;
+      font-size: 12px;
+      color: #777;
+      border-top: 1px solid #eee;
+      margin-top: 20px;
+    }
+    .button {
+      display: inline-block;
+      background-color: #d97706;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+    .summary {
+      margin-top: 20px;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+    }
+    .total {
+      font-weight: bold;
+      border-top: 1px solid #eee;
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+    .shipping-info {
+      margin: 20px 0;
+    }
+    .highlight {
+      color: #d97706;
+    }
+    @media only screen and (max-width: 600px) {
+      .container {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="https://yourdomain.com/images/logo.png" alt="Global Gourmet" class="logo">
+      <h1>Thank You for Your Order!</h1>
+    </div>
+    
+    <p>Dear {{customerName}},</p>
+    
+    <p>We're excited to let you know that your order has been received and is being processed. Here's a summary of your purchase:</p>
+    
+    <div class="order-info">
+      <p><strong>Order Number:</strong> {{orderNumber}}</p>
+      <p><strong>Order Date:</strong> {{orderDate}}</p>
+      <p><strong>Payment Method:</strong> {{paymentMethod}}</p>
+    </div>
+    
+    <div class="order-details">
+      <h2>Order Details</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each items}}
+          <tr>
+            <td>{{name}}</td>
+            <td>{{quantity}}</td>
+            <td>${{price}}</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+      
+      <div class="summary">
+        <div class="summary-row">
+          <span>Subtotal:</span>
+          <span>${{subtotal}}</span>
+        </div>
+        <div class="summary-row">
+          <span>Shipping:</span>
+          <span>${{shipping}}</span>
+        </div>
+        <div class="summary-row">
+          <span>Tax:</span>
+          <span>${{tax}}</span>
+        </div>
+        {{#if discount}}
+        <div class="summary-row">
+          <span>Discount:</span>
+          <span>-${{discount}}</span>
+        </div>
+        {{/if}}
+        <div class="summary-row total">
+          <span>Total:</span>
+          <span>${{total}}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="shipping-info">
+      <h2>Shipping Information</h2>
+      <p>
+        {{shippingName}}<br>
+        {{shippingAddress1}}<br>
+        {{#if shippingAddress2}}{{shippingAddress2}}<br>{{/if}}
+        {{shippingCity}}, {{shippingState}} {{shippingZip}}<br>
+        {{shippingCountry}}
+      </p>
+      <p><strong>Shipping Method:</strong> {{shippingMethod}}</p>
+      <p><strong>Estimated Delivery:</strong> {{estimatedDelivery}}</p>
+    </div>
+    
+    <div style="text-align: center;">
+      <a href="{{orderUrl}}" class="button">View Order Details</a>
+    </div>
+    
+    <p>If you have any questions about your order, please don't hesitate to <a href="{{contactUrl}}" class="highlight">contact our customer service team</a>.</p>
+    
+    <p>Thank you for shopping with Global Gourmet!</p>
+    
+    <div class="footer">
+      <p>&copy; {{currentYear}} Global Gourmet. All rights reserved.</p>
+      <p>
+        <a href="{{privacyUrl}}" class="highlight">Privacy Policy</a> | 
+        <a href="{{termsUrl}}" class="highlight">Terms of Service</a>
+      </p>
+      <p>You're receiving this email because you made a purchase at Global Gourmet.</p>
+    </div>
+  </div>
+</body>
+</html>

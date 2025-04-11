@@ -28,6 +28,7 @@ export type Product = {
 
 export type UserProfile = {
   id: string;
+  email: string | null;
   first_name: string | null;
   last_name: string | null;
   phone: string | null;
@@ -37,16 +38,22 @@ export type UserProfile = {
   postal_code: string | null;
   country: string | null;
   is_admin: boolean;
+  email_newsletter: boolean;
+  email_order_updates: boolean;
+  email_promotions: boolean;
+  sms_order_updates: boolean;
+  sms_promotions: boolean;
   created_at: string;
   updated_at: string;
 };
 
 export type Order = {
   id: string;
+  order_number?: string;
   user_id: string;
   status: string;
   subtotal: number;
-  total_amount: number;
+  total: number;
   shipping_amount: number;
   tax_amount: number;
   discount_amount: number;
@@ -59,6 +66,7 @@ export type Order = {
   payment_status: string;
   coupon_code: string | null;
   coupon_id: string | null;
+  item_count?: number;
   created_at: string;
   updated_at: string;
 };
@@ -156,6 +164,35 @@ export type Coupon = {
   end_date: string | null;
   usage_limit: number | null;
   usage_count: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type Address = {
+  id: string;
+  user_id: string;
+  full_name: string;
+  address_line1: string;
+  address_line2?: string | null;
+  city: string;
+  state: string;
+  postal_code: string;
+  country: string;
+  phone: string;
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PaymentMethod = {
+  id: string;
+  user_id: string;
+  cardholder_name: string;
+  last_four: string;
+  card_type: string;
+  expiry_month: string;
+  expiry_year: string;
+  is_default: boolean;
   created_at: string;
   updated_at: string;
 };

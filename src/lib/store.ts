@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Product, CartItem, Category } from '../types/database.types';
+import { Product, CartItem, Category, Address, PaymentMethod } from '../types/database.types';
 
 interface CartStore {
   items: CartItem[];
@@ -212,6 +212,58 @@ export const useAuthStore = create<AuthStore>((set) => ({
       userId: null,
       isAdmin: false,
       user: null
+    });
+  },
+}));
+
+interface CheckoutStore {
+  shippingAddress: Address | null;
+  billingAddress: Address | null;
+  shippingMethod: any | null;
+  paymentMethod: PaymentMethod | null;
+  orderId: string | null;
+  setShippingAddress: (address: Address) => void;
+  setBillingAddress: (address: Address | null) => void;
+  setShippingMethod: (method: any) => void;
+  setPaymentMethod: (method: PaymentMethod) => void;
+  setOrderId: (id: string) => void;
+  clearCheckout: () => void;
+}
+
+export const useCheckoutStore = create<CheckoutStore>((set) => ({
+  shippingAddress: null,
+  billingAddress: null,
+  shippingMethod: null,
+  paymentMethod: null,
+  orderId: null,
+
+  setShippingAddress: (address: Address) => {
+    set({ shippingAddress: address });
+  },
+
+  setBillingAddress: (address: Address | null) => {
+    set({ billingAddress: address });
+  },
+
+  setShippingMethod: (method: any) => {
+    set({ shippingMethod: method });
+  },
+
+  setPaymentMethod: (method: PaymentMethod) => {
+    set({ paymentMethod: method });
+  },
+
+  setOrderId: (id: string) => {
+    set({ orderId: id });
+  },
+
+  clearCheckout: () => {
+    set({
+      shippingAddress: null,
+      billingAddress: null,
+      shippingMethod: null,
+      paymentMethod: null,
+      orderId: null
     });
   },
 }));

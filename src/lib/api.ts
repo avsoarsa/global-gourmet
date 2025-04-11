@@ -10,7 +10,10 @@ import {
   WishlistItem,
   GiftBox,
   BulkOrderRequest,
-  Review
+  Review,
+  UserProfile,
+  Address,
+  PaymentMethod
 } from '../types/database.types';
 
 // Products API
@@ -444,6 +447,18 @@ export const getUserOrders = async (userId: string): Promise<Order[]> => {
   return data || [];
 };
 
+export const getRecentOrders = async (userId: string, limit: number = 5): Promise<Order[]> => {
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return data || [];
+};
+
 export const getOrderById = async (orderId: string): Promise<Order | null> => {
   const { data, error } = await supabase
     .from('orders')
@@ -687,5 +702,314 @@ export const subscribeToProductNotifications = async (email: string, productId: 
     console.error('Error subscribing to product notifications:', error);
     return false;
   }
+};
+
+// User Profile API
+export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+export const updateUserProfile = async (
+  userId: string,
+  profileData: {
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    emailNewsletter?: boolean;
+    emailOrderUpdates?: boolean;
+    emailPromotions?: boolean;
+    smsOrderUpdates?: boolean;
+    smsPromotions?: boolean;
+  }
+): Promise<UserProfile> => {
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .update({
+      first_name: profileData.firstName,
+      last_name: profileData.lastName,
+      phone: profileData.phone,
+      email_newsletter: profileData.emailNewsletter,
+      email_order_updates: profileData.emailOrderUpdates,
+      email_promotions: profileData.emailPromotions,
+      sms_order_updates: profileData.smsOrderUpdates,
+      sms_promotions: profileData.smsPromotions,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', userId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+// Address API
+export const getUserAddresses = async (userId: string): Promise<Address[]> => {
+  const { data, error } = await supabase
+    .from('addresses')
+    .select('*')
+    .eq('user_id', userId)
+    .order('is_default', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+};
+
+export const getAddressById = async (addressId: string): Promise<Address | null> => {
+  const { data, error } = await supabase
+    .from('addresses')
+    .select('*')
+    .eq('id', addressId)
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+export const createAddress = async (
+  userId: string,
+  addressData: {
+    fullName: string;
+    addressLine1: string;
+    addressLine2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+    phone: string;
+    isDefault: boolean;
+  }
+): Promise<Address> => {
+  // If setting as default, update all other addresses to not be default
+  if (addressData.isDefault) {
+    await supabase
+      .from('addresses')
+      .update({ is_default: false })
+      .eq('user_id', userId);
+  }
+
+  const { data, error } = await supabase
+    .from('addresses')
+    .insert({
+      user_id: userId,
+      full_name: addressData.fullName,
+      address_line1: addressData.addressLine1,
+      address_line2: addressData.addressLine2,
+      city: addressData.city,
+      state: addressData.state,
+      postal_code: addressData.postalCode,
+      country: addressData.country,
+      phone: addressData.phone,
+      is_default: addressData.isDefault,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+export const updateAddress = async (
+  addressId: string,
+  userId: string,
+  addressData: {
+    fullName: string;
+    addressLine1: string;
+    addressLine2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+    phone: string;
+    isDefault: boolean;
+  }
+): Promise<Address> => {
+  // If setting as default, update all other addresses to not be default
+  if (addressData.isDefault) {
+    await supabase
+      .from('addresses')
+      .update({ is_default: false })
+      .eq('user_id', userId);
+  }
+
+  const { data, error } = await supabase
+    .from('addresses')
+    .update({
+      full_name: addressData.fullName,
+      address_line1: addressData.addressLine1,
+      address_line2: addressData.addressLine2,
+      city: addressData.city,
+      state: addressData.state,
+      postal_code: addressData.postalCode,
+      country: addressData.country,
+      phone: addressData.phone,
+      is_default: addressData.isDefault,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', addressId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+export const deleteAddress = async (addressId: string): Promise<void> => {
+  const { error } = await supabase
+    .from('addresses')
+    .delete()
+    .eq('id', addressId);
+
+  if (error) throw error;
+};
+
+export const setDefaultAddress = async (addressId: string, userId: string): Promise<void> => {
+  // First, set all addresses to not default
+  await supabase
+    .from('addresses')
+    .update({ is_default: false })
+    .eq('user_id', userId);
+
+  // Then set the selected address as default
+  const { error } = await supabase
+    .from('addresses')
+    .update({ is_default: true })
+    .eq('id', addressId);
+
+  if (error) throw error;
+};
+
+// Payment Methods API
+export const getUserPaymentMethods = async (userId: string): Promise<PaymentMethod[]> => {
+  const { data, error } = await supabase
+    .from('payment_methods')
+    .select('*')
+    .eq('user_id', userId)
+    .order('is_default', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+};
+
+export const getPaymentMethodById = async (paymentMethodId: string): Promise<PaymentMethod | null> => {
+  const { data, error } = await supabase
+    .from('payment_methods')
+    .select('*')
+    .eq('id', paymentMethodId)
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+export const createPaymentMethod = async (
+  userId: string,
+  paymentData: {
+    cardholderName: string;
+    cardNumber: string; // Only last 4 digits will be stored
+    cardType: string;
+    expiryMonth: string;
+    expiryYear: string;
+    isDefault: boolean;
+  }
+): Promise<PaymentMethod> => {
+  // If setting as default, update all other payment methods to not be default
+  if (paymentData.isDefault) {
+    await supabase
+      .from('payment_methods')
+      .update({ is_default: false })
+      .eq('user_id', userId);
+  }
+
+  // Extract last 4 digits of card number
+  const lastFour = paymentData.cardNumber.replace(/\D/g, '').slice(-4);
+
+  const { data, error } = await supabase
+    .from('payment_methods')
+    .insert({
+      user_id: userId,
+      cardholder_name: paymentData.cardholderName,
+      last_four: lastFour,
+      card_type: paymentData.cardType,
+      expiry_month: paymentData.expiryMonth,
+      expiry_year: paymentData.expiryYear,
+      is_default: paymentData.isDefault,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+export const updatePaymentMethod = async (
+  paymentMethodId: string,
+  userId: string,
+  paymentData: {
+    cardholderName: string;
+    expiryMonth: string;
+    expiryYear: string;
+    isDefault: boolean;
+  }
+): Promise<PaymentMethod> => {
+  // If setting as default, update all other payment methods to not be default
+  if (paymentData.isDefault) {
+    await supabase
+      .from('payment_methods')
+      .update({ is_default: false })
+      .eq('user_id', userId);
+  }
+
+  const { data, error } = await supabase
+    .from('payment_methods')
+    .update({
+      cardholder_name: paymentData.cardholderName,
+      expiry_month: paymentData.expiryMonth,
+      expiry_year: paymentData.expiryYear,
+      is_default: paymentData.isDefault,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', paymentMethodId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+export const deletePaymentMethod = async (paymentMethodId: string): Promise<void> => {
+  const { error } = await supabase
+    .from('payment_methods')
+    .delete()
+    .eq('id', paymentMethodId);
+
+  if (error) throw error;
+};
+
+export const setDefaultPaymentMethod = async (paymentMethodId: string, userId: string): Promise<void> => {
+  // First, set all payment methods to not default
+  await supabase
+    .from('payment_methods')
+    .update({ is_default: false })
+    .eq('user_id', userId);
+
+  // Then set the selected payment method as default
+  const { error } = await supabase
+    .from('payment_methods')
+    .update({ is_default: true })
+    .eq('id', paymentMethodId);
+
+  if (error) throw error;
 };
 
