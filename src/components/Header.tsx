@@ -37,7 +37,7 @@ export default function Header() {
         <div className="flex items-center space-x-4">
           <Link href="/cart" className="relative text-gray-700 hover:text-amber-600">
             <i className="fas fa-shopping-cart text-xl"></i>
-            <span className="absolute -top-2 -right-2 bg-amber-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{totalItems}</span>
+            <span className="absolute -top-2 -right-2 bg-amber-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{totalItems()}</span>
           </Link>
           <Link href="/wishlist" className="relative text-gray-700 hover:text-amber-600">
             <i className="fas fa-heart text-xl"></i>

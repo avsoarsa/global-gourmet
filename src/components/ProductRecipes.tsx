@@ -26,7 +26,7 @@ export default function ProductRecipes({ productName }: ProductRecipesProps) {
         prepTime: '10 mins',
         cookTime: '0 mins',
         difficulty: 'Easy',
-        imageUrl: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80'
+        imageUrl: '/images/products/trail-mix.jpg'
       },
       {
         id: '2',
@@ -35,7 +35,7 @@ export default function ProductRecipes({ productName }: ProductRecipesProps) {
         prepTime: '15 mins',
         cookTime: '25 mins',
         difficulty: 'Medium',
-        imageUrl: 'https://images.unsplash.com/photo-1517093157656-b9eccef01cb1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80'
+        imageUrl: '/images/products/almonds.jpg'
       }
     ];
 
@@ -49,7 +49,7 @@ export default function ProductRecipes({ productName }: ProductRecipesProps) {
           prepTime: '15 mins',
           cookTime: '60 mins',
           difficulty: 'Easy',
-          imageUrl: 'https://images.unsplash.com/photo-1605286978633-2dec93ff88a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80'
+          imageUrl: '/images/products/walnuts.jpg'
         },
         {
           id: '4',
@@ -58,7 +58,7 @@ export default function ProductRecipes({ productName }: ProductRecipesProps) {
           prepTime: '10 mins',
           cookTime: '5 mins',
           difficulty: 'Easy',
-          imageUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80'
+          imageUrl: '/images/products/cashews.jpg'
         },
         ...commonRecipes
       ];
@@ -71,7 +71,7 @@ export default function ProductRecipes({ productName }: ProductRecipesProps) {
           prepTime: '5 mins',
           cookTime: '15 mins',
           difficulty: 'Easy',
-          imageUrl: 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80'
+          imageUrl: '/images/products/almonds.jpg'
         },
         {
           id: '6',
@@ -80,7 +80,7 @@ export default function ProductRecipes({ productName }: ProductRecipesProps) {
           prepTime: '20 mins',
           cookTime: '25 mins',
           difficulty: 'Medium',
-          imageUrl: 'https://images.unsplash.com/photo-1518492104633-130d0cc84637?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80'
+          imageUrl: '/images/products/cashews.jpg'
         },
         ...commonRecipes
       ];
@@ -93,7 +93,7 @@ export default function ProductRecipes({ productName }: ProductRecipesProps) {
           prepTime: '15 mins',
           cookTime: '30 mins',
           difficulty: 'Medium',
-          imageUrl: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80'
+          imageUrl: '/images/products/cashews.jpg'
         },
         {
           id: '8',
@@ -102,7 +102,7 @@ export default function ProductRecipes({ productName }: ProductRecipesProps) {
           prepTime: '10 mins (plus soaking time)',
           cookTime: '0 mins',
           difficulty: 'Medium',
-          imageUrl: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1473&q=80'
+          imageUrl: '/images/products/cashews.jpg'
         },
         ...commonRecipes
       ];
